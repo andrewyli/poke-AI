@@ -1,0 +1,6 @@
+class Pokemon(Object):
+    
+    def __init__(self, name, item, moveset, poss_moveset, evs):
+        
+        self.name = name
+        self.
