@@ -8,7 +8,6 @@ def read_from_movesets():
     lines = f.readlines()
 
     index = 0
-    print 1
     while index < len(lines):
         name_info = lines[index].split()
         name = name_info[0]
@@ -75,9 +74,13 @@ def read_from_movesets():
 
 
 def main():
-    print 1
     pokemon = read_from_movesets()
-    for p in pokemon:
-        print p.name
+    enemy_team = []
+    print "Enter the names of the opposing pokemon: "
 
+    for i in range(6):
+        print "Pkmn " + i + ": "
+        pkmn = raw_input()
+        enemy_team.append(pkmn)
+        print enemy_team[i]
 main()
