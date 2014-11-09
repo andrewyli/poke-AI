@@ -39,10 +39,12 @@ def main():
         for p in poss_team[index]:
             if compare_pkmn(enemy_team[index], p):
                 potential.append(p)
+        for p in potential:
+            p.print_info()
 
         find_p = [p for p in your_team if p.name.lower() == y_pkmn.lower()]
         index = your_team.index(find_p[0])
-
+        
         for p in potential:
             print "hey"
             for mbar in p.moveset:
@@ -72,8 +74,8 @@ def main():
                 elif m.mstyle == "atk":
                     mod = 1
                     for t in typedict[p.name]:
-                        print typedict["snubbull"]
-                        numarr = [x for x in typechart[t.lower()] if x[0] == typedict[y_pkmn][1][0:3]]
+                        print t
+                        numarr = [x for x in typechart if x[0] == typedict[y_pkmn]]
                         if numarr[0][1] == 0:
                             mod *= 1
                         elif numarr[0][1] == 1:
@@ -249,8 +251,7 @@ def read_from_pokemon():
         if pname == "mr." or pname == "mime":
             pname += " " + p[index + 1].lower()
             index += 1
-        if p[3].lower() == pname:
-            index += 1
+        index += 2
         ptype = []
         ptype.append(p[index].lower())
         if len(p) > index + 1:
