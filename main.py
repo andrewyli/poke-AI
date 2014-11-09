@@ -7,8 +7,8 @@ def main():
     pokemon = read_from_sets("movesets")
     moves = read_from_movelist()
     stats = read_from_statlist()
-    print stats
     typedict = read_from_pokemon()
+    typechart = read_from_typechart()
     enemy_team = read_enemy_team()
     poss_team = lookup_sets(pokemon, enemy_team)  # the first of the outputs of lookup_sets
     your_team = read_from_sets("team")  # this is not actually a list of strings (it's pokes)
@@ -16,36 +16,52 @@ def main():
     for i in range(6):
         enemy_temp = enemy_team[i]
         enemy_team[i] = Pokemon(enemy_temp, None, None, None, [], [0, 0, 0, 0, 0, 0], True)
-    elimination(poss_team, enemy_team, your_team)
 
-
-def elimination(poss_team, enemy_team, your_team):
     while True:
-        print "Pokemon (enter \"quit\" to quit): "
-        pkmn = raw_input()
-        if pkmn == "quit":
-            break
-        print "info_type (moveset, item, ability): "
-        itype = raw_input()
-        print "info: "
-        info = raw_input()
-        
-        find_p = [p for p in enemy_team if p.name.lower() == pkmn.lower()]
-        index = enemy_team.index(find_p[0])
 
+        print "Their Pokemon (enter \"quit\" to quit): "
+        e_pkmn = raw_input().lower()
+        if e_pkmn == "quit":
+            break
+        print "Your Pokemon: "
+        y_pkmn = raw_input().lower()
+        print "info_type (moveset, item, ability): "
+        itype = raw_input().lower()
+        print "info: "
+        info = raw_input().lower()
+
+        find_p = [p for p in enemy_team if p.name.lower() == e_pkmn.lower()]
+        index = enemy_team.index(find_p[0])
+        
         potential = []
         enemy_team[index].update_info(itype, info)
         print enemy_team[index].moveset
         for p in poss_team[index]:
             if compare_pkmn(enemy_team[index], p):
                 potential.append(p)
+
+        index = your_team.index(y_pkmn)
+
         for p in potential:
             for m in p.moveset:
-                
-        """
-        for p in potential:
-            p.print_info()
-        """
+                if m.mtype == "N/A":
+                    continue
+                elif m.mstyle == "SpA":
+                    mod = 1
+                    for t in typedict[p]:
+                        numarr = [x for x in typechart[t.lower()] if x[0] == typedict[y_pkmn]]
+                        if numarr[0][1] == 0:
+                            mod *= 1
+                        elif numarr[0][1] == 1:
+                            mod *= 2
+                        elif numarr[0][1] == 2:
+                            mod *= 0.5
+                        elif numarr[0][1] == 3:
+                            mod *= 0
+                    if typedict[p] == m.mtype:
+                        mod *= 1.5
+                    dmg = ((2 * 100 + 10) / 250 * (141 + 2 * stats[e_pkmn][3] + 63) / (141 + 2 * stats[y_pkmn][4] + your_team[index].evs[4]) * m.mdmg + 2) * 0.85
+                    print dmg
 
 
 def compare_pkmn(p1, p2):
@@ -196,14 +212,17 @@ def read_from_pokemon():
     typings = {}
     for pstr in plist:
         p = pstr.split()
-        pname = p[2].lower()
-        i = 0
+        index = 2
+        pname = p[index].lower()
+        if pname == "mr." or pname == "mime":
+            pname += " " + p[index + 1].lower()
+            index += 1
         if p[3].lower() == pname:
-            i = 1
+            index += 1
         ptype = []
-        ptype.append(p[3 + i].lower())
-        if len(p) > 4 + i:
-            ptype.append(p[4 + i].lower())
+        ptype.append(p[index].lower())
+        if len(p) > index + 1:
+            ptype.append(p[index + 1].lower())
         typings[pname] = ptype
     return typings
 
@@ -214,12 +233,46 @@ def read_from_statlist():
     stats = {}
     for sstr in slist:
         s = sstr.split()
-        sname = p[2].lower()
-        i = 0
-        if s[3][0] == "(":
-            i = 1
-            sname = s[3][1:len(s[3])].lower(0)
-        base_stats = [int(s[3 + i]), int(s[4 + i]), int(s[5 + i]), int(s[6 + i]), int(s[7 + i]), int(s[8 + i])]
+        index = 2
+        sname = s[index].lower()
+        if sname == "mr." or sname == "mime":
+            sname += " " + s[index + 1].lower()
+            index += 1
+        index += 1
+        if s[index][0] == "(":
+            leftindex = sstr.index("(")
+            rightindex = sstr.index(")")
+            sname = sstr[leftindex + 1:rightindex].lower()
+            # print sname
+            while not is_number(s[index]):
+                index += 1
+                # print s[index]
+
+        base_stats = [int(s[index]), int(s[1 + index]), int(s[2 + index]), int(s[3 + index]), int(s[4 + index]), int(s[5 + index])]
         stats[sname] = base_stats
+    return stats
+
+
+def read_from_typechart():
+    f = open("typechart.txt", "r")
+    typechart = {}
+    for i in range(18):
+        tname = f.readline().split()[0].lower()
+        tarr = []
+        for j in range(18):
+            ttemp = f.readline().lower()
+            ttemp2 = ttemp.split()
+            tarr.append(ttemp2)
+        typechart[tname] = tarr
+        f.readline()
+    return typechart
+
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 main()
