@@ -8,6 +8,7 @@ def main():
     moves = read_from_movelist()
     stats = read_from_statlist()
     typedict = read_from_pokemon()
+    print typedict
     typechart = read_from_typechart()
     enemy_team = read_enemy_team()
     poss_team = lookup_sets(pokemon, enemy_team)  # the first of the outputs of lookup_sets
@@ -18,7 +19,6 @@ def main():
         enemy_team[i] = Pokemon(enemy_temp, None, None, None, [], [0, 0, 0, 0, 0, 0], True)
 
     while True:
-
         print "Their Pokemon (enter \"quit\" to quit): "
         e_pkmn = raw_input().lower()
         if e_pkmn == "quit":
@@ -40,16 +40,21 @@ def main():
             if compare_pkmn(enemy_team[index], p):
                 potential.append(p)
 
-        index = your_team.index(y_pkmn)
+        find_p = [p for p in your_team if p.name.lower() == y_pkmn.lower()]
+        index = your_team.index(find_p[0])
 
         for p in potential:
-            for m in p.moveset:
-                if m.mtype == "N/A":
+            print "hey"
+            for mbar in p.moveset:
+                mtemplist = [x for x in moves if x.mname == mbar]
+                m = mtemplist[0]
+                print m.mstyle
+                if m.mstyle == "n/a":
                     continue
-                elif m.mstyle == "SpA":
+                elif m.mstyle == "spa":
                     mod = 1
                     for t in typedict[p]:
-                        numarr = [x for x in typechart[t.lower()] if x[0] == typedict[y_pkmn]]
+                        numarr = [x for x in typechart[t.lower()] if (x[0] == typedict[y_pkmn][1][0:3])]
                         if numarr[0][1] == 0:
                             mod *= 1
                         elif numarr[0][1] == 1:
@@ -62,6 +67,31 @@ def main():
                         mod *= 1.5
                     dmg = ((2 * 100 + 10) / 250 * (141 + 2 * stats[e_pkmn][3] + 63) / (141 + 2 * stats[y_pkmn][4] + your_team[index].evs[4]) * m.mdmg + 2) * 0.85
                     print dmg
+                    if dmg >= 141 + 2 * stats[y_pkmn][0]:
+                        get_rect()
+                elif m.mstyle == "atk":
+                    mod = 1
+                    for t in typedict[p.name]:
+                        print typedict["snubbull"]
+                        numarr = [x for x in typechart[t.lower()] if x[0] == typedict[y_pkmn][1][0:3]]
+                        if numarr[0][1] == 0:
+                            mod *= 1
+                        elif numarr[0][1] == 1:
+                            mod *= 2
+                        elif numarr[0][1] == 2:
+                            mod *= 0.5
+                        elif numarr[0][1] == 3:
+                            mod *= 0
+                    if typedict[p] == m.mtype:
+                        mod *= 1.5
+                    dmg = ((2 * 100 + 10) / 250 * (141 + 2 * stats[e_pkmn][1] + 63) / (141 + 2 * stats[y_pkmn][2] + your_team[index].evs[2]) * m.mdmg + 2) * 0.85
+                    print dmg
+                    if dmg >= 141 + 2 * stats[y_pkmn][0]:
+                        get_rect()
+
+
+def get_rect():
+    print "SWITCH OUT OR THE SHRECKAGE WILL BE REAL"
 
 
 def compare_pkmn(p1, p2):
@@ -119,8 +149,8 @@ def read_from_sets(file_name):
     index = 0
     while index < len(lines):
         name_info = lines[index].split()
-        name = name_info[0]
-        item = name_info[2]
+        name = name_info[0].lower()
+        item = name_info[2].lower()
         for i in range(3, len(name_info)):
             item += " " + name_info[i]
         # print "Name: " + name
@@ -137,6 +167,8 @@ def read_from_sets(file_name):
             ability = "?"
             # print ability
             index -= 1
+        abfe = ability.lower()
+        ability = abfe
 
         index += 1
         evs_info = lines[index].split()
@@ -160,7 +192,7 @@ def read_from_sets(file_name):
 
         index += 1
         nature_info = lines[index].split()
-        nature = nature_info[0]
+        nature = nature_info[0].lower()
         # print nature
 
         moveset = []
