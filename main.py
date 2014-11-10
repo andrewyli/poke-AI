@@ -44,9 +44,8 @@ def main():
 
         find_p = [p for p in your_team if p.name.lower() == y_pkmn.lower()]
         index = your_team.index(find_p[0])
-        
+        """
         for p in potential:
-            print "hey"
             for mbar in p.moveset:
                 mtemplist = [x for x in moves if x.mname == mbar]
                 m = mtemplist[0]
@@ -90,6 +89,7 @@ def main():
                     print dmg
                     if dmg >= 141 + 2 * stats[y_pkmn][0]:
                         get_rect()
+"""
 
 
 def get_rect():
@@ -251,7 +251,7 @@ def read_from_pokemon():
         if pname == "mr." or pname == "mime":
             pname += " " + p[index + 1].lower()
             index += 1
-        index += 2
+        index += 1
         ptype = []
         ptype.append(p[index].lower())
         if len(p) > index + 1:
